@@ -9,7 +9,8 @@ db.once('open', function() {
     var playlist = new mongoose.Schema({
         playlistName: String,
         ownerId: Number,
-        friendsIds: Array
+        friendsIds: Array,
+        songs: Array
     });
 
     playlist.set('toJSON', {
@@ -51,14 +52,23 @@ app.use(bodyParser.json())
 //     });
 // });
 
-// app.get('/playlists/:id', function(req, res, next) {
-//     Playlist.find({id: req.body.playlistId}, function(err, playlist) {
-//         if (err) return next(err);
-//         res.json({
-//             playlist
-//         });
-//     });
-// });
+app.get('/playlists/:userId', function(req, res, next) {
+    Playlist.find({ownerId: req.params.userId}, function(err, playlists) {
+        if (err) return next(err);
+        res.json({
+            playlists
+        });
+    });
+});
+
+app.get('/playlist/:playlistId', function(req, res, next) {
+    Playlist.find({_id: req.params.playlistId}, function(err, playlist) {
+        if (err) return next(err);
+        res.json({
+            playlist
+        });
+    });
+});
 
 app.post('/playlist/new', function(req, res, next) {
     var playlist = new Playlist({
