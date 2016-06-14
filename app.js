@@ -70,6 +70,15 @@ app.get('/playlist/:playlistId', function(req, res, next) {
     });
 });
 
+app.post('/playlist/:playlistId', function(req, res, next) {
+    Playlist.findByIdAndUpdate(req.params.playlistId, { $push: { "songs": req.body } }, function(err, result){
+        if(err){
+            console.log(err);
+        }
+        console.log("RESULT: " + result);
+    });
+});
+
 app.post('/playlist/new', function(req, res, next) {
     var playlist = new Playlist({
         ownerId: req.body.ownerId,
