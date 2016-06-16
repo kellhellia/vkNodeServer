@@ -52,6 +52,7 @@ app.use(bodyParser.json())
 //     });
 // });
 
+// Get all user playlists
 app.get('/playlists/:userId', function(req, res, next) {
     Playlist.find({ownerId: req.params.userId}, function(err, playlists) {
         if (err) return next(err);
@@ -61,15 +62,19 @@ app.get('/playlists/:userId', function(req, res, next) {
     });
 });
 
+
+// Get current playlist
 app.get('/playlist/:playlistId', function(req, res, next) {
-    Playlist.find({_id: req.params.playlistId}, function(err, playlist) {
+    Playlist.findById({_id: req.params.playlistId}, function(err, playlist) {
         if (err) return next(err);
+
         res.json({
             playlist
         });
     });
 });
 
+// Add song to playlist
 app.post('/playlist/:playlistId', function(req, res, next) {
     Playlist.findByIdAndUpdate(req.params.playlistId, { $push: { "songs": req.body } }, function(err, result){
         if(err){
@@ -79,6 +84,7 @@ app.post('/playlist/:playlistId', function(req, res, next) {
     });
 });
 
+// Add new user playlist
 app.post('/playlist/new', function(req, res, next) {
     var playlist = new Playlist({
         ownerId: req.body.ownerId,
@@ -95,30 +101,7 @@ app.post('/playlist/new', function(req, res, next) {
 app.get('/', function (req, res, next) {
     res.json(
         {
-            "article": [
-                {
-                    "title": "article - 1",
-                    "content": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quo nobis eum deserunt ad. Corrupti maxime quisquam velit unde, eum ab magni! Incidunt nam maiores dolores ullam vitae, adipisci fugit omnis!"
-                }
-            ],
-            "article2": [
-                {
-                    "title": "article - 2",
-                    "content": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quo nobis eum deserunt ad. Corrupti maxime quisquam velit unde, eum ab magni! Incidunt nam maiores dolores ullam vitae, adipisci fugit omnis!"
-                }
-            ],
-            "article3": [
-                {
-                    "title": "article - 3",
-                    "content": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quo nobis eum deserunt ad. Corrupti maxime quisquam velit unde, eum ab magni! Incidunt nam maiores dolores ullam vitae, adipisci fugit omnis!"
-                }
-            ],
-            "article4": [
-                {
-                    "title": "article - 4",
-                    "content": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quo nobis eum deserunt ad. Corrupti maxime quisquam velit unde, eum ab magni! Incidunt nam maiores dolores ullam vitae, adipisci fugit omnis!"
-                }
-            ]
+            "hello": "hello"
         }
     );
 });
