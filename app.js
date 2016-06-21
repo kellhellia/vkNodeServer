@@ -80,36 +80,32 @@ app.get('/playlist/:playlistId', function(req, res, next) {
 
 // Add track to playlist
 app.post('/playlist/:playlistId', function(req, res, next) {
-    if (req.params.playlistId) {
-        Playlist.findById(req.params.playlistId, function(err, playlist) {
-            if (err) return next(err);
+    Playlist.findById(req.params.playlistId, function(err, playlist) {
+        if (err) return next(err);
 
-            var count = playlist.songs.length + 1;
-            var track = req.body;
-            track.counter = count;
+        var trackId = playlist.songs.length + 1;
+        var track = req.body;
+        track.trackId = trackId;
 
-            playlist.songs.push(track);
-            playlist.save(track);
+        playlist.songs.push(track);
+        playlist.save();
 
-            return res.json(playlist);
-        });
-    }
+        return res.json(playlist);
+    });
 });
 
-app.post('/rm-playlist/:playlistId', function(req, res, next) {
-    console.log(req.params.playlistId);
-    console.log(req.body);
+app.delete('/rm-playlist/:playlistId', function(req, res, next) {
+    Playlist.findById(req.params.playlistId, function(err, playlist) {
+        if (err) return next(err);
 
-    /* Получаем трек
-       Находим плейлист, достаем массив песен
-       Фильтруем массив, пушим в базу
-    */
-    // Playlist.findByIdAndUpdate(req.params.playlistId, { $push: { "songs": req.body } }, function(err, result){
-    //     if(err){
-    //         console.log(err);
-    //     }
-    //     console.log("RESULT: " + result);
-    // });
+        var result = playlist.songs.filter(function(track) {
+            return req.body.trackId !== track.trackId;
+        });
+
+        playlist.songs = result;
+
+        playlist.save();
+    });
 });
 
 app.get('/', function (req, res, next) {
