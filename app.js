@@ -41,16 +41,21 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
-// app.get('/playlists', function(req, res, next) {
-//     Playlist.find(function(err, playlists) {
-//         if (err) return next(err);
-//         res.json({
-//             playlists
-//         });
-//     });
-// });
+// Add new user playlist
+app.post('/playlist/new', function(req, res, next) {
+    var playlist = new Playlist({
+        ownerId: req.body.ownerId,
+        playlistName: req.body.playlistName
+    });
+
+    playlist.save(function(err, thor) {
+        if (err) return console.error(err);
+
+        res.send('playlist ' + req.body.playlistName + ' added');
+    });
+});
 
 // Get all user playlists
 app.get('/playlists/:userId', function(req, res, next) {
@@ -61,7 +66,6 @@ app.get('/playlists/:userId', function(req, res, next) {
         });
     });
 });
-
 
 // Get current playlist
 app.get('/playlist/:playlistId', function(req, res, next) {
@@ -74,28 +78,38 @@ app.get('/playlist/:playlistId', function(req, res, next) {
     });
 });
 
-// Add song to playlist
+// Add track to playlist
 app.post('/playlist/:playlistId', function(req, res, next) {
-    Playlist.findByIdAndUpdate(req.params.playlistId, { $push: { "songs": req.body } }, function(err, result){
-        if(err){
-            console.log(err);
-        }
-        console.log("RESULT: " + result);
-    });
+    if (req.params.playlistId) {
+        Playlist.findById(req.params.playlistId, function(err, playlist) {
+            if (err) return next(err);
+
+            var count = playlist.songs.length + 1;
+            var track = req.body;
+            track.counter = count;
+
+            playlist.songs.push(track);
+            playlist.save(track);
+
+            return res.json(playlist);
+        });
+    }
 });
 
-// Add new user playlist
-app.post('/playlist/new', function(req, res, next) {
-    var playlist = new Playlist({
-        ownerId: req.body.ownerId,
-        playlistName: req.body.playlistName
-    });
+app.post('/rm-playlist/:playlistId', function(req, res, next) {
+    console.log(req.params.playlistId);
+    console.log(req.body);
 
-    playlist.save(function(err, thor) {
-        if (err) return console.error(err);
-
-        res.send('playlist' + req.body.playlistName + ' added');
-    });
+    /* Получаем трек
+       Находим плейлист, достаем массив песен
+       Фильтруем массив, пушим в базу
+    */
+    // Playlist.findByIdAndUpdate(req.params.playlistId, { $push: { "songs": req.body } }, function(err, result){
+    //     if(err){
+    //         console.log(err);
+    //     }
+    //     console.log("RESULT: " + result);
+    // });
 });
 
 app.get('/', function (req, res, next) {
