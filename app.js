@@ -9,7 +9,7 @@ db.once('open', function() {
     var playlist = new mongoose.Schema({
         playlistName: String,
         ownerId: Number,
-        friendsIds: Array,
+        friends: Array,
         songs: Array
     });
 
@@ -105,6 +105,20 @@ app.delete('/rm-playlist/:playlistId', function(req, res, next) {
         playlist.songs = result;
 
         playlist.save();
+
+        return res.json(playlist);
+    });
+});
+
+app.post('/friend/:playlistId', function(req, res, next) {
+    Playlist.findById(req.params.playlistId, function(err, playlist) {
+        if (err) return next(err);
+
+        var friendId = req.body.friendId;
+        playlist.friends.push(friendId);
+        playlist.save();
+
+        return res.json(playlist);
     });
 });
 
