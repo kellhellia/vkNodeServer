@@ -110,6 +110,7 @@ app.delete('/rm-playlist/:playlistId', function(req, res, next) {
     });
 });
 
+// Add friend to playlist
 app.post('/friend/:playlistId', function(req, res, next) {
     Playlist.findById(req.params.playlistId, function(err, playlist) {
         if (err) return next(err);
@@ -122,12 +123,21 @@ app.post('/friend/:playlistId', function(req, res, next) {
     });
 });
 
-app.get('/', function (req, res, next) {
-    res.json(
-        {
-            "hello": "hello"
-        }
-    );
+// Remove friend from playlist
+app.delete('/friend/:playlistId', function(req, res, next) {
+    Playlist.findById(req.params.playlistId, function(err, playlist) {
+        if (err) return next(err);
+
+        var result = playlist.friends.filter(function(friendId) {
+            return req.body.friendId !== friendId;
+        });
+
+        playlist.friends = result;
+
+        playlist.save();
+
+        return res.json(playlist);
+    });
 });
 
 var server = app.listen(3000, function () {
