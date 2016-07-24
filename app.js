@@ -58,8 +58,18 @@ app.post('/playlist/new', function(req, res, next) {
 });
 
 // Get all user playlists
+app.get('/playlists/my/:userId', function(req, res, next) {
+    Playlist.find({ ownerId: req.params.userId }, function(err, playlists) {
+        if (err) return next(err);
+        res.json({
+            playlists
+        });
+    });
+});
+
+// Get all playlists, where user was added
 app.get('/playlists/:userId', function(req, res, next) {
-    Playlist.find({ownerId: req.params.userId}, function(err, playlists) {
+    Playlist.find({ friends: req.params.userId }, function(err, playlists) {
         if (err) return next(err);
         res.json({
             playlists
